@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import { userContext } from "../context/userContext.jsx";
 
 const Register = () => {
+  const { setUser } = useContext(userContext); // Access context here
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -27,6 +29,7 @@ const Register = () => {
         { withCredentials: true }
       );
       console.log(response.data);
+      setUser(response.data.user);
       navigate("/home"); // Redirect to the login page after successful registration
     } catch (err) {
       if (err.response && err.response.data.message) {

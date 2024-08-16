@@ -1,24 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { userContext } from "../context/userContext.jsx";
 import { Link } from "react-router-dom";
 
 const Login = () => {
+  const { setUser } = useContext(userContext); // No need to destructure `user` since it's not used
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
     try {
       const response = await axios.post(
         "http://localhost:8004/user/login",
         { username, password },
         { withCredentials: true }
       );
-      console.log(response.data);
-      navigate("/home"); // Redirect to the homepage or any other route on successful login
+
+      if (response.status === 200 && response.data.user) {
+        console.log(response.data);
+        setUser(response.data.user);
+        setSuccess("Login successful! Redirecting...");
+
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
+      } else {
+        setError("Login failed");
+      }
     } catch (err) {
       if (err.response && err.response.data.message) {
         setError(err.response.data.message);
@@ -33,6 +49,7 @@ const Login = () => {
       <form onSubmit={submitHandler}>
         <h2>Login</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        {success && <p style={{ color: "green" }}>{success}</p>}
         <div>
           <label>Username:</label>
           <input
@@ -52,7 +69,7 @@ const Login = () => {
           />
         </div>
         <button type="submit">Login</button>
-        <p>Dont Have an account?</p>
+        <p>Don't have an account?</p>
         <Link to={"/register"}> Sign up for free!</Link>
       </form>
     </div>
