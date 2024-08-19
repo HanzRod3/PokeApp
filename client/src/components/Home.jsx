@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Import Link from react-router-dom
 import { userContext } from "../context/userContext.jsx";
 import { logout } from "../services/logoutUser.jsx";
 
@@ -31,6 +31,12 @@ const Home = () => {
     <div className="bg-blue-500 text-white p-4">
       <h1>Welcome {user.username}</h1>
       <button onClick={handleLogout}>Logout</button>
+      {/* Add a Link component to navigate to the search page */}
+      <div>
+        <Link to="/search" className="text-white underline">
+          Go to Search Pokémon
+        </Link>
+      </div>
     </div>
   );
 };

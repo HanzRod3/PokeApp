@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const activeRoster = new Schema(
+const ActiveRosterSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -25,4 +25,4 @@ const activeRoster = new Schema(
   }
 );
 
-export default model("ActiveRoster", activeRoster);
+export default model("ActiveRoster", ActiveRosterSchema);

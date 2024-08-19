@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const pokeContainer = new Schema(
+const pokeContainerSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -17,4 +17,4 @@ const pokeContainer = new Schema(
   { timestamps: true }
 );
 
-export default model("PokeContainer", pokeContainer);
+export default model("PokeContainer", pokeContainerSchema);
