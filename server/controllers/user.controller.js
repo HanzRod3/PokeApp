@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 export const loginUser = async (req, res) => {
@@ -32,15 +33,11 @@ export const loginUser = async (req, res) => {
   }
 };
 
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.SECRET_KEY);
-};
-
 export const registerUser = async (req, res) => {
   try {
     const user = new User(req.body);
     const savedUser = await user.save();
-    const token = createToken(savedUser._id);
+    const token = jwt.sign({ id: savedUser._id }, process.env.SECRET_KEY);
     res
       .cookie("usertoken", token, { httpOnly: true })
       .status(201)

@@ -1,42 +1,104 @@
-import React, { useContext, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom"; // Import Link from react-router-dom
+import React, { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { userContext } from "../context/userContext.jsx";
 import { logout } from "../services/logoutUser.jsx";
 
 const Home = () => {
-  const { user, setUser } = useContext(userContext);
-  const navigate = useNavigate();
+  const { user, setUser } = useContext(userContext); // Destructure setUser from context
+  const [pokeContainer, setPokeContainer] = useState(null);
+  const [activeRoster, setActiveRoster] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate(); // Use navigate for redirecting after logout
 
   useEffect(() => {
-    if (!user) {
-      navigate("/"); // Redirect to login if user is not authenticated
-    }
-  }, [user, navigate]);
+    const fetchPokeContainer = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8004/pokecontainer",
+          {
+            headers: {
+              usertoken: user.token, // Ensure the token is sent in the headers
+            }, // Include credentials to receive the cookie
+            withCredentials: true,
+          }
+        );
+        console.log(response);
+
+        setPokeContainer(response.data.pokeContainer); // Set the fetched PokeContainer to state
+        console.log(pokeContainer);
+      } catch (error) {
+        setError("Error fetching PokeContainer");
+        console.error(error);
+      }
+    };
+
+    const fetchActiveRoster = async () => {
+      try {
+        const response = await axios.get("http://localhost:8004/activeroster", {
+          headers: {
+            usertoken: user.token, // Ensure the token is sent in the headers
+          }, //
+          withCredentials: true,
+        });
+        setActiveRoster(response.data.activeRoster); // Set the fetched Active Roster to state
+      } catch (error) {
+        setError("Error fetching Active Roster");
+        console.error(error);
+      }
+    };
+
+    fetchPokeContainer();
+    fetchActiveRoster();
+  }, [user]);
 
   const handleLogout = async () => {
+    // Create a function to handle logout
     try {
-      await logout();
-      setUser(null);
-      navigate("/");
+      //
+      await logout(); // Call the logout function from services
+      setUser(null); // Clear the user data from context
+      navigate("/"); // Redirect to login page
     } catch (error) {
-      console.log("Error logging out", error);
+      console.error("Logout failed", error);
+      setError("Logout failed, please try again.");
     }
   };
 
-  if (!user) {
-    return <p>Loading...</p>;
-  }
-
   return (
-    <div className="bg-blue-500 text-white p-4">
-      <h1>Welcome {user.username}</h1>
-      <button onClick={handleLogout}>Logout</button>
-      {/* Add a Link component to navigate to the search page */}
-      <div>
-        <Link to="/search" className="text-white underline">
-          Go to Search Pokémon
-        </Link>
+    <div>
+      <h1>Welcome, {user.username}</h1>
+      {error && <p>{error}</p>}
+      {pokeContainer && (
+        <div>
+          <h2>Your PokeContainer:</h2>
+          <ul>
+            {pokeContainer.pokemons.map((pokemon) => (
+              <li key={pokemon._id}>
+                {pokemon.name} (#{pokemon.pokedexNumber})
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {activeRoster && (
+        <div>
+          <h2>Your Active Roster:</h2>
+          <ul>
+            {activeRoster.activePokemons.map((pokemon) => (
+              <li key={pokemon._id}>
+                {pokemon.name} (#{pokemon.pokedexNumber})
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div style={{ marginTop: "20px" }}>
+        <Link to="/search">Go to Search Pokémon</Link>
       </div>
+      <button onClick={handleLogout} style={{ marginTop: "20px" }}>
+        Logout
+      </button>
     </div>
   );
 };

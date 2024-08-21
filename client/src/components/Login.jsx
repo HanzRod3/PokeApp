@@ -5,7 +5,7 @@ import { userContext } from "../context/userContext.jsx";
 import { Link } from "react-router-dom";
 
 const Login = () => {
-  const { setUser } = useContext(userContext); // No need to destructure `user` since it's not used
+  const { setUser } = useContext(userContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,13 +25,14 @@ const Login = () => {
       );
 
       if (response.status === 200 && response.data.user) {
-        console.log(response.data);
-        setUser(response.data.user);
+        const token = response.data.token;
+        setUser({ ...response.data.user, token });
         setSuccess("Login successful! Redirecting...");
+        console.log(response.data.user);
 
         setTimeout(() => {
           navigate("/home");
-        }, 2000);
+        }, 10000);
       } else {
         setError("Login failed");
       }
@@ -70,7 +71,7 @@ const Login = () => {
         </div>
         <button type="submit">Login</button>
         <p>Don't have an account?</p>
-        <Link to={"/register"}> Sign up for free!</Link>
+        <Link to="/register">Sign up for free!</Link>
       </form>
     </div>
   );

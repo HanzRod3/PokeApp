@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import mongooseUniqueValidator from "mongoose-unique-validator";
-import validator from "validator";
 import bcrypt from "bcrypt";
+import validator from "validator";
 
 const { isEmail } = validator;
 
@@ -36,25 +36,7 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-// middleware
-// Virtual field for confirm password
-UserSchema.virtual("confirmPassword")
-  .get(function () {
-    return this._confirmPassword;
-  })
-  .set(function (value) {
-    this._confirmPassword = value;
-  });
-
-// Pre-validation hook to check if passwords match
-UserSchema.pre("validate", function (next) {
-  if (this.password !== this.confirmPassword) {
-    this.invalidate("confirmPassword", "Password must match confirm password");
-  }
-  next();
-});
-
-// Pre-save hook to hash the password
+// Middleware to hash password before saving
 UserSchema.pre("save", function (next) {
   if (!this.isModified("password")) return next();
   bcrypt

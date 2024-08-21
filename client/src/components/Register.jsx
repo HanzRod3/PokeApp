@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { userContext } from "../context/userContext.jsx";
+import { Link } from "react-router-dom";
 
 const Register = () => {
-  const { setUser } = useContext(userContext); // Access context here
+  const { setUser } = useContext(userContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -30,7 +31,7 @@ const Register = () => {
       );
       console.log(response.data);
       setUser(response.data.user);
-      navigate("/home"); // Redirect to the login page after successful registration
+      navigate("/home");
     } catch (err) {
       if (err.response && err.response.data.message) {
         setError(err.response.data.message);
@@ -100,7 +101,7 @@ const Register = () => {
           />
         </div>
         <button type="submit">Register</button>
-        <Link to={"/"}> Home</Link>
+        <Link to="/">Home</Link>
       </form>
     </div>
   );
